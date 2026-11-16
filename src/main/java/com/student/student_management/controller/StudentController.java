@@ -3,6 +3,8 @@ package com.student.student_management.controller;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,10 +17,18 @@ import com.student.student_management.dto.StudentResponse;
 import com.student.student_management.entity.Student;
 import com.student.student_management.service.StudentService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping("/api/students")
 @CrossOrigin(origins = "http://localhost:4200")
+@Tag(name = "Student APIs",
+	description = "Operations related to students")
 public class StudentController {
+	
+	private static final Logger logger =
+            LoggerFactory.getLogger(StudentController.class);
 
     private final StudentService service;
 
@@ -77,10 +87,12 @@ public class StudentController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Get student by ID")
     @GetMapping("/{id}")
     public ResponseEntity<StudentResponse> getStudent(
             @PathVariable Long id) {
     	
+    	logger.info("Inside getStudent details by Id : Id : "+id);
     	Student student = service.getStudentById(id);
     	List<CourseResponse> courses =
                 student.getCourses().stream()
@@ -105,9 +117,11 @@ public class StudentController {
                 courses
             );
 
+    	logger.info("Response of getStudent details by Id : response : "+response);
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Update student details by ID")
     @PutMapping("/update/{id}")
     public ResponseEntity<Student> updateStudent(
             @PathVariable Long id,
